@@ -28,6 +28,7 @@ const L = {
   back:['Good. Back to work.','Finally. Continue.','Good. Do not stop again.'],
   early:['No. Too early. You are not done.','Nice try. Keep working.','Finish early? I do not think so.'],
   pass:['Good job. That looks right.','Yes. That is real work. I am proud.','Approved. Nicely done.'],
+  focus:['Focus. Do not poke me.','Hey! Eyes on your task.','Stop poking me. Keep working.','No distractions! Finish your task.','I am trying to help you focus!'],
   sad:['Ow. Why did you drop me?','That hurt. I am sad.','Please be gentle with me.'],
   angry:['WHO DROPPED ME FROM UP THERE?!','That was way too high! I am angry!'],
   giggle:['Hehe, that tickles.','Hey! That is my belly.','Stop it. Okay, do not stop.']
@@ -180,12 +181,17 @@ buddy.addEventListener('pointerup', release); buddy.addEventListener('pointercan
 let busy = false;
 function tap(t) {
   const mode = app.dataset.mode;
+  if (mode === 'task') return taskPoke();
   if (t.closest('.face')) {
     if (mode === 'home') return faceBite();
-    if (mode === 'task') { vib(60); return void say('Focus. Do not poke me.', 'angry', 1600); }
     if (mode === 'night') return void say('Zzz… shh.', 'sleep');
   }
   vib(20); say(rand(L.giggle), 'happy', 1400);
+}
+function taskPoke() {
+  const bite = Math.random() < .3;
+  chomp(); vib(bite ? [45, 30, 70] : 45);
+  say(rand(L.focus), bite ? 'bite' : 'angry', 1300);
 }
 async function faceBite() {
   if (busy) return; busy = true;
