@@ -44,7 +44,16 @@
   </main>
 
   <footer id="bottom">
-    <div class="pane p-home"><button id="start" class="big">Start task</button></div>
+    <div class="pane p-home">
+      <div id="durationPicker">
+        <div class="duration-copy"><b>Task length</b><small>Scroll to choose</small></div>
+        <div class="duration-wheel-wrap">
+          <div id="durationWheel" role="spinbutton" tabindex="0" aria-label="Task length in minutes" aria-valuemin="1" aria-valuemax="60" aria-valuenow="10"></div>
+          <span>min</span>
+        </div>
+      </div>
+      <button id="start" class="big">Start task</button>
+    </div>
     <div class="pane p-task">
       <div id="timer"><div id="bar"></div><span id="clock">10:00</span></div>
       <button id="finish" class="big">Finish ✓</button>

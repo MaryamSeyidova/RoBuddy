@@ -41,7 +41,7 @@ const ITEMS = {
 
 /* ---------- state ---------- */
 const def = {name:'',goal:'',coins:60,own:['c:peach','h:none','b:none'],eq:{c:'peach',h:'none',b:'none'},
-  day:'',done:0,phase:'idle',m:-1,left:0,total:0,voice:'',pitch:.7,rate:.95};
+  day:'',done:0,phase:'idle',m:-1,left:0,total:0,duration:10,voice:'',pitch:.7,rate:.95};
 let S; try { S = {...def, ...JSON.parse(localStorage.getItem('robuddy-v3') || '{}')}; } catch { S = {...def}; }
 const dayKey = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; };
 if (S.day !== dayKey()) { S.day = dayKey(); S.done = 0; S.phase = 'idle'; S.m = -1; }
@@ -50,6 +50,40 @@ const rand = a => a[Math.floor(Math.random() * a.length)];
 const wait = ms => new Promise(r => setTimeout(r, ms));
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const vib = p => navigator.vibrate && navigator.vibrate(p);
+const DURATION_MIN = 1, DURATION_MAX = 60, DURATION_ROW = 30;
+S.duration = clamp(Math.round(Number(S.duration) || 10), DURATION_MIN, DURATION_MAX);
+
+const durationWheel = $('#durationWheel');
+function syncDurationWheel() {
+  S.duration = clamp(Math.round(durationWheel.scrollTop / DURATION_ROW) + DURATION_MIN, DURATION_MIN, DURATION_MAX);
+  durationWheel.setAttribute('aria-valuenow', S.duration);
+  durationWheel.querySelectorAll('.minute').forEach(row => row.classList.toggle('selected', Number(row.dataset.minute) === S.duration));
+}
+function buildDurationWheel() {
+  durationWheel.innerHTML = '<div class="duration-spacer"></div>' +
+    Array.from({length:DURATION_MAX}, (_, i) => `<div class="minute" data-minute="${i + 1}">${i + 1}</div>`).join('') +
+    '<div class="duration-spacer"></div>';
+  durationWheel.scrollTop = (S.duration - DURATION_MIN) * DURATION_ROW;
+  syncDurationWheel();
+  let durationSave;
+  durationWheel.addEventListener('scroll', () => {
+    syncDurationWheel();
+    clearTimeout(durationSave);
+    durationSave = setTimeout(save, 140);
+  }, {passive:true});
+  durationWheel.addEventListener('click', e => {
+    const row = e.target.closest('.minute');
+    if (row) durationWheel.scrollTo({top:(Number(row.dataset.minute) - DURATION_MIN) * DURATION_ROW, behavior:'smooth'});
+  });
+  durationWheel.addEventListener('keydown', e => {
+    const jumps = {ArrowUp:-1,ArrowDown:1,PageUp:-5,PageDown:5};
+    if (e.key in jumps) {
+      e.preventDefault();
+      const next = clamp(S.duration + jumps[e.key], DURATION_MIN, DURATION_MAX);
+      durationWheel.scrollTo({top:(next - DURATION_MIN) * DURATION_ROW, behavior:'smooth'});
+    }
+  });
+}
 
 const app = $('#app'), st = $('#stage'), buddy = $('#buddy');
 
@@ -228,7 +262,7 @@ function renderTask() {
   const T = TASKS[S.m];
   $('#tTitle').textContent = T.t;
   $('#tSteps').innerHTML = T.s.map(x => `<li>${x}</li>`).join('');
-  $('#tMeta').textContent = `Task ${S.done + 1} of ${TASKS_PER_DAY} · +20 ✦`;
+  $('#tMeta').textContent = `Task ${S.done + 1} of ${TASKS_PER_DAY} · ${S.duration} min · +20 ✦`;
 }
 function paintTimer() {
   const m = String(Math.floor(S.left / 60)).padStart(2, '0'), s = String(S.left % 60).padStart(2, '0');
@@ -245,14 +279,15 @@ function runTimer() {
 }
 async function startTask() {
   if (S.done >= TASKS_PER_DAY) return;
+  syncDurationWheel();
   goFull();
   let i; do { i = Math.floor(Math.random() * TASKS.length); } while (i === S.m);
   S.m = i; const T = TASKS[i];
-  S.total = S.left = Math.round(T.min * (FAST ? 6 : 60)); S.phase = 'task'; save();
+  S.total = S.left = Math.round(S.duration * (FAST ? 6 : 60)); S.phase = 'task'; save();
   $('#start').classList.remove('pulse');
   renderTask(); setMode('task'); runTimer();
   history.pushState(null, '', location.href);
-  say(`Task ${S.done + 1}. ${T.t}. ${T.min} minutes. ${T.s[0]}`, 'smile');
+  say(`Task ${S.done + 1}. ${T.t}. ${S.duration} minutes. ${T.s[0]}`, 'smile');
 }
 $('#start').onclick = startTask;
 function pauseResume() {
@@ -453,5 +488,5 @@ document.addEventListener('touchend', e => {
   if (now - lastBuddyTouch < 400) e.preventDefault();
   lastBuddyTouch = now;
 }, {passive:false});
-paintCoins(); refreshLook(); layout(true); requestAnimationFrame(loop); buddy.classList.add('idle');
+buildDurationWheel(); paintCoins(); refreshLook(); layout(true); requestAnimationFrame(loop); buddy.classList.add('idle');
 if (!S.name) $('#welcome').showModal(); else boot();

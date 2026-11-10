@@ -109,7 +109,21 @@ p{margin:0}
 #nav button span{font-size:24px}
 #nav button.on{background:#efe9ff;border-color:var(--ink)}
 
+/* Home task-length picker */
+#durationPicker{min-height:98px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 12px;background:#fff;border:3px solid var(--ink);border-radius:16px;box-shadow:0 3px 0 var(--ink)}
+.duration-copy{display:grid;gap:3px}
+.duration-copy b{font-size:17px}
+.duration-copy small{font-size:12px;color:#665a76}
+.duration-wheel-wrap{display:flex;align-items:center;gap:6px}
+#durationWheel{width:56px;height:90px;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;text-align:center;outline-offset:0}
+#durationWheel::-webkit-scrollbar{display:none}
+.duration-spacer,.minute{height:30px;flex:none}
+.minute{display:grid;place-items:center;scroll-snap-align:center;font-size:16px;font-variant-numeric:tabular-nums;color:#716982;opacity:.62}
+.minute.selected{border-radius:9px;background:#efe9ff;color:var(--ink);font-size:20px;font-weight:700;opacity:1}
+.duration-wheel-wrap>span{font-size:14px;font-weight:600}
+
 [data-mode=home] .p-home,[data-mode=task] .p-task,[data-mode=shop] .p-shop{display:block}
+[data-mode=home] .p-home{display:grid;gap:8px}
 [data-mode=task] #taskcard,[data-mode=task] #pause,[data-mode=night] #lockmsg{display:block}
 [data-mode=task] #nav{display:none}
 [data-mode=night] #stage{background:#2b2748}
