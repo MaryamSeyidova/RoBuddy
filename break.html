@@ -51,17 +51,18 @@
     </div> -->
 
     <div id="hud"><span id="hudT">Break zone</span><b id="hudC">3:00</b></div>
-    <button id="backBuddy" type="button">Back to RoBuddy</button>
+    <a id="backBuddy" href="index.html?back=1">Back to RoBuddy</a>
     <script>
       // Break zone: max 3 minutes, can end early. Returns to the buddy site (?r=...), which then gives the next task.
       (function(){
         var q=new URLSearchParams(location.search);
         var back=q.get('r')||'index.html', left=Math.max(0,parseInt(q.get('t'),10)||180), c=document.getElementById('hudC');
+        var backLink=document.getElementById('backBuddy');
         function fmt(){c.textContent=Math.floor(left/60)+':'+String(left%60).padStart(2,'0');}
-        function go(){location.href=back+(back.indexOf('?')>-1?'&':'?')+'back=1';}
+        function go(){var destination=new URL(back,location.href);destination.searchParams.set('back','1');location.assign(destination.href);}
+        var destination=new URL(back,location.href);destination.searchParams.set('back','1');backLink.href=destination.href;
         fmt();
         var iv=setInterval(function(){left=Math.max(0,left-1);fmt();if(left<=0){clearInterval(iv);go();}},1000);
-        document.getElementById('backBuddy').addEventListener('click',go);
         ['pointerdown','touchstart','touchmove'].forEach(function(ev){document.getElementById('hud').addEventListener(ev,function(e){e.stopPropagation();});});
         ['pointerdown','touchstart','touchmove'].forEach(function(ev){document.getElementById('backBuddy').addEventListener(ev,function(e){e.stopPropagation();});});
       })();

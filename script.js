@@ -13,13 +13,13 @@ const BW = 200, BH = 250, TASKS_PER_DAY = 3;
 /* ---------- content ---------- */
 const TASKS = [
   {t:'Open your project', min:1, s:['Open the file you need.','Do not edit yet.','Look at it for five minutes.']},
-  {t:'Improve one tiny detail', min:1, s:['Pick one small detail.','Make it better.','Save your work.']},
-  {t:'Learn one useful thing', min:1, s:['Find one short tutorial.','Learn one idea only.','Write it in one sentence.']},
+  {t:'Improve one tiny detail', min:3, s:['Pick one small detail.','Make it better.','Save your work.']},
+  {t:'Learn one useful thing', min:2, s:['Find one short tutorial.','Learn one idea only.','Write it in one sentence.']},
   {t:'Make a rough first draft', min:1, s:['Start a timer-free sketch.','Do not judge it.','Save it as draft one.']},
-  {t:'Reset your workspace', min:1, s:['Put five things away.','Close five tabs.','Keep only what you need.']},
+  {t:'Reset your workspace', min:2, s:['Put five things away.','Close five tabs.','Keep only what you need.']},
   {t:'Collect three references', min:1, s:['Find three examples.','Save one detail from each.','Write the pattern you see.']},
-  {t:'Finish one open loop', min:1, s:['Pick something almost done.','Remove the last obstacle.','Mark it complete.']},
-  {t:'Practice out loud', min:1, s:['Pick one idea or pitch.','Say it out loud once.','Say it again, a bit better.']}
+  {t:'Finish one open loop', min:5, s:['Pick something almost done.','Remove the last obstacle.','Mark it complete.']},
+  {t:'Practice out loud', min:5, s:['Pick one idea or pitch.','Say it out loud once.','Say it again, a bit better.']}
 ];
 const PENALTIES = ['Do 10 jumping jacks.','Drink a full glass of water.','Stand up and stretch for 30 seconds.','Put 5 things back where they belong.','Do 10 slow squats.'];
 const L = {
@@ -408,7 +408,7 @@ $('#wForm').addEventListener('submit', () => {
 /* ---------- boot ---------- */
 function boot() {
   const back = /[?&]back=1/.test(location.search);
-  if (back) history.replaceState(null, '', location.pathname);
+  if (back) { try { history.replaceState(null, '', location.pathname); } catch {} }
   if (S.phase === 'task' && S.left > 0) {
     setMode('task'); renderTask(); paused = true; paintTimer(); $('#pause').textContent = '▶ Resume';
     setMood('angry'); say('You left the task. Resume when you are ready.', 'angry', 0, false); return;
