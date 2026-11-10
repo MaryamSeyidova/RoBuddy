@@ -9,7 +9,7 @@
     
     <link rel="stylesheet" type="text/css" href="break.css">
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 
   </head>
   <body>
@@ -52,6 +52,7 @@
 
     <div id="hud"><span id="hudT">Break zone</span><b id="hudC">3:00</b></div>
     <a id="backBuddy" href="index.html?back=1">Back to RoBuddy</a>
+    <div id="rotatePrompt" role="status" aria-live="polite"><div><span aria-hidden="true">↻</span><b>Keep RoBuddy upright</b><p>Please turn your phone back to portrait.</p></div></div>
     <script>
       // Break zone: max 3 minutes, can end early. Returns to the buddy site (?r=...), which then gives the next task.
       (function(){
@@ -63,6 +64,12 @@
         function go(){location.assign(backLink.href);}
         function activate(e){if(e){e.preventDefault();e.stopPropagation();}if(navigating)return;navigating=true;location.assign(backLink.href);}
         var destination=new URL(back,location.href);destination.searchParams.set('back','1');backLink.href=destination.href;
+        function blockPinch(e){if(e.touches&&e.touches.length>1)e.preventDefault();}
+        function lockPortrait(){try{if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('portrait').catch(function(){});}catch(e){}}
+        document.addEventListener('pointerup',lockPortrait,{passive:true});
+        document.addEventListener('touchstart',blockPinch,{passive:false});
+        document.addEventListener('touchmove',blockPinch,{passive:false});
+        ['gesturestart','gesturechange','gestureend'].forEach(function(ev){document.addEventListener(ev,function(e){e.preventDefault();},{passive:false});});
         fmt();
         var iv=setInterval(function(){left=Math.max(0,left-1);fmt();if(left<=0){clearInterval(iv);go();}},1000);
         backLink.addEventListener('touchend',activate,{passive:false});

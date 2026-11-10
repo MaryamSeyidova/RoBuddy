@@ -163,3 +163,11 @@ input[type=range]{padding:0;accent-color:var(--lav)}
 
 @media (prefers-reduced-motion:reduce){#buddy.idle .b3d,.big.pulse,.m-purr .head{animation:none}}
 @media (min-width:561px){#app{border-inline:3px solid var(--ink)}}
+#rotatePrompt{display:none}
+@media (orientation:landscape) and (max-height:600px) and (pointer:coarse){
+  #rotatePrompt{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:24px;background:linear-gradient(160deg,#fff4ea,#ffe3ee 70%,#eef6ff);color:#2a2040;text-align:center;font-family:Fredoka,ui-rounded,system-ui,sans-serif}
+  #rotatePrompt div{max-width:320px}
+  #rotatePrompt span{display:block;font-size:44px;color:#7657e8;margin-bottom:8px}
+  #rotatePrompt b{display:block;font-size:25px}
+  #rotatePrompt p{margin-top:8px;font-size:17px}
+}

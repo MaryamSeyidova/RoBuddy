@@ -18,7 +18,7 @@ const TASKS = [
   {t:'Make a rough first draft', min:1, s:['Start a timer-free sketch.','Do not judge it.','Save it as draft one.']},
   {t:'Reset your workspace', min:2, s:['Put five things away.','Close five tabs.','Keep only what you need.']},
   {t:'Collect three references', min:1, s:['Find three examples.','Save one detail from each.','Write the pattern you see.']},
-  {t:'Finish one open loop', min:5, s:['Pick something almost done.','Remove the last obstacle.','Mark it complete.']},
+  {t:'Finish one open loop', min:1, s:['Pick something almost done.','Remove the last obstacle.','Mark it complete.']},
   {t:'Practice out loud', min:5, s:['Pick one idea or pitch.','Say it out loud once.','Say it again, a bit better.']}
 ];
 const PENALTIES = ['Do 10 jumping jacks.','Drink a full glass of water.','Stand up and stretch for 30 seconds.','Put 5 things back where they belong.','Do 10 slow squats.'];
@@ -351,8 +351,15 @@ document.addEventListener('visibilitychange', () => {
   } else if (away) { away = false; say('Where did you go?! Timer paused. Resume.', 'angry'); }
 });
 function goFull() {
-  try { document.documentElement.requestFullscreen && document.documentElement.requestFullscreen().catch(() => {}); } catch {}
+  try {
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().then(lockPortrait).catch(() => {});
+    } else lockPortrait();
+  } catch { lockPortrait(); }
   try { navigator.wakeLock && navigator.wakeLock.request('screen').catch(() => {}); } catch {}
+}
+function lockPortrait() {
+  try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('portrait').catch(() => {}); } catch {}
 }
 
 /* ---------- shop ---------- */
@@ -426,8 +433,19 @@ function boot() {
 }
 addEventListener('resize', () => layout(false) || (P.y = Math.min(P.y, ground())));
 // Keep pinch and double-tap zoom from changing the game viewport on mobile Safari.
+document.addEventListener('pointerup', lockPortrait, {passive:true});
 document.addEventListener('gesturestart', e => e.preventDefault(), {passive:false});
 document.addEventListener('gesturechange', e => e.preventDefault(), {passive:false});
 document.addEventListener('gestureend', e => e.preventDefault(), {passive:false});
+function blockPinchZoom(e) { if (e.touches && e.touches.length > 1) e.preventDefault(); }
+document.addEventListener('touchstart', blockPinchZoom, {passive:false});
+document.addEventListener('touchmove', blockPinchZoom, {passive:false});
+let lastBuddyTouch = 0;
+document.addEventListener('touchend', e => {
+  if (!e.target.closest || !e.target.closest('#buddy')) { lastBuddyTouch = 0; return; }
+  const now = performance.now();
+  if (now - lastBuddyTouch < 400) e.preventDefault();
+  lastBuddyTouch = now;
+}, {passive:false});
 paintCoins(); refreshLook(); layout(true); requestAnimationFrame(loop); buddy.classList.add('idle');
 if (!S.name) $('#welcome').showModal(); else boot();
