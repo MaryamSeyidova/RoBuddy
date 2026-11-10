@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#fff1e6">
+<title>RoBuddy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app" data-mode="home">
+
+  <header id="top">
+    <div id="greet"><p id="say">Hi!</p><button id="hear" aria-label="Hear buddy">🔊</button></div>
+    <div id="coins" aria-label="Coins">✦ <b id="coinN">0</b></div>
+    <button id="gear" aria-label="Settings">⚙</button>
+  </header>
+
+  <main id="stage">
+    <div id="buddy" class="m-smile">
+      <div class="b3d">
+        <i class="ant"></i>
+        <div class="head">
+          <div class="ear l"></div><div class="ear r"></div>
+          <div class="face"><i class="eye l"></i><i class="eye r"></i>
+            <div class="mouth"><u class="t"></u><u class="b"></u></div></div>
+          <span class="cheek l"></span><span class="cheek r"></span>
+          <div id="hat"></div>
+        </div>
+        <div class="body"><span id="bodyIcon"></span><i class="led"></i></div>
+      </div>
+      <div class="shadow"></div>
+    </div>
+
+    <section id="taskcard">
+      <h2 id="tTitle">Task</h2>
+      <ol id="tSteps"></ol>
+      <p id="tMeta"></p>
+    </section>
+    <button id="pause" aria-label="Pause or resume">⏸ Pause</button>
+    <p id="lockmsg">See you tomorrow. Don't be late.</p>
+  </main>
+
+  <footer id="bottom">
+    <div class="pane p-home"><button id="start" class="big">Start task</button></div>
+    <div class="pane p-task">
+      <div id="timer"><div id="bar"></div><span id="clock">10:00</span></div>
+      <button id="finish" class="big">Finish ✓</button>
+    </div>
+    <div class="pane p-shop">
+      <div id="tabs"><button data-c="c" class="on">Shells</button><button data-c="h">Hats</button><button data-c="b">Costumes</button></div>
+      <div id="items"></div>
+    </div>
+    <nav id="nav"><button data-m="home" class="on"><span>🏠</span>Home</button><button data-m="shop"><span>🛍</span>Shop</button></nav>
+  </footer>
+</div>
+
+<dialog id="welcome"><form method="dialog" id="wForm">
+  <h2>Hi, I'm RoBuddy.</h2>
+  <p>I pick your tasks. I don't let you quit. Three a day.</p>
+  <label>Your name<input id="wName" required maxlength="24" autocomplete="given-name"></label>
+  <label>What are you working toward?<input id="wGoal" required maxlength="80" placeholder="e.g. my design portfolio"></label>
+  <button class="big">Meet my buddy</button></form></dialog>
+
+<dialog id="settings"><form method="dialog">
+  <h2>Voice &amp; settings</h2>
+  <label>Voice<select id="sVoice"></select></label>
+  <label>Deepness<input id="sPitch" type="range" min="0.1" max="1.2" step="0.05"></label>
+  <label>Speed<input id="sRate" type="range" min="0.6" max="1.3" step="0.05"></label>
+  <label>Break zone link<input id="sBreak" placeholder="break/index.html"></label>
+  <button type="button" id="sTest" class="ghost">Test voice</button>
+  <button type="button" id="sReset" class="ghost">Reset today (testing)</button>
+  <button class="big">Done</button></form></dialog>
+
+<dialog id="proof"><div>
+  <h2>Prove it.</h2><p id="pHint">Show me the finished task.</p>
+  <div id="cam"><video id="vid" playsinline muted></video><img id="snap" alt=""></div>
+  <input id="file" type="file" accept="image/*" capture="environment" hidden>
+  <div class="row"><button id="pSnap" class="big">📸 Take picture</button><button id="pCancel" class="ghost">Back</button></div>
+</div></dialog>
+
+<dialog id="penalty"><div>
+  <h2>Penalty task</h2><p id="penText"></p><div id="penClock">0</div>
+  <button id="penGo" class="big" disabled>Do it…</button>
+</div></dialog>
+
+<canvas id="work" width="64" height="64" hidden></canvas>
+<script src="script.js"></script>
+</body>
+</html>
