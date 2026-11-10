@@ -58,11 +58,16 @@
         var q=new URLSearchParams(location.search);
         var back=q.get('r')||'index.html', left=Math.max(0,parseInt(q.get('t'),10)||180), c=document.getElementById('hudC');
         var backLink=document.getElementById('backBuddy');
+        var navigating=false;
         function fmt(){c.textContent=Math.floor(left/60)+':'+String(left%60).padStart(2,'0');}
-        function go(){var destination=new URL(back,location.href);destination.searchParams.set('back','1');location.assign(destination.href);}
+        function go(){location.assign(backLink.href);}
+        function activate(e){if(e){e.preventDefault();e.stopPropagation();}if(navigating)return;navigating=true;location.assign(backLink.href);}
         var destination=new URL(back,location.href);destination.searchParams.set('back','1');backLink.href=destination.href;
         fmt();
         var iv=setInterval(function(){left=Math.max(0,left-1);fmt();if(left<=0){clearInterval(iv);go();}},1000);
+        backLink.addEventListener('touchend',activate,{passive:false});
+        backLink.addEventListener('pointerup',function(e){if(e.pointerType==='touch')activate(e);});
+        backLink.addEventListener('click',activate);
         ['pointerdown','touchstart','touchmove'].forEach(function(ev){document.getElementById('hud').addEventListener(ev,function(e){e.stopPropagation();});});
         ['pointerdown','touchstart','touchmove'].forEach(function(ev){document.getElementById('backBuddy').addEventListener(ev,function(e){e.stopPropagation();});});
       })();
