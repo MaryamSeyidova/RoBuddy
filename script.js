@@ -6,7 +6,7 @@ const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAl
 if (location.search.includes('fast')) localStorage.setItem('rb-fast', '1');
 if (location.search.includes('slow')) localStorage.removeItem('rb-fast');
 const FAST = localStorage.getItem('rb-fast') === '1';
-const DEFAULT_BREAK = 'break/index.html';   // change to your hosted nfc-audio link, or set it in ⚙
+const DEFAULT_BREAK = 'https://maryamseyidova.github.io/NFC-audio/';
 const VISION_ENDPOINT = '';                 // optional: your server that judges photos → {ok:boolean, comment:string}
 const BW = 200, BH = 250, TASKS_PER_DAY = 3;
 
@@ -52,13 +52,16 @@ const vib = p => navigator.vibrate && navigator.vibrate(p);
 
 const app = $('#app'), st = $('#stage'), buddy = $('#buddy');
 
-/* ---------- voice (male, not the generic default) ---------- */
+/* ---------- voice ---------- */
 const MALE = /daniel|alex\b|fred|aaron|arthur|oliver|rishi|ralph|google uk english male|microsoft (guy|david|mark|ryan|george|james|christopher|eric|roger|steffan|brian|thomas)|\bmale\b/i;
 const FEMALE = /samantha|karen|aria|zira|susan|victoria|moira|tessa|fiona|jenny|google us english|female|hazel|catherine|sonia|libby/i;
+const PREFERRED_VOICE = /cellso|celso|cellos/i;
 const voices = () => ('speechSynthesis' in window) ? speechSynthesis.getVoices() : [];
 function pickVoice() {
   const vs = voices();
   return vs.find(v => v.name === S.voice) ||
+    vs.find(v => PREFERRED_VOICE.test(v.name) && /^en-US$/i.test(v.lang)) ||
+    vs.find(v => /^en-US$/i.test(v.lang)) ||
     vs.find(v => MALE.test(v.name) && /^en/i.test(v.lang)) ||
     vs.find(v => /^en/i.test(v.lang) && !FEMALE.test(v.name)) || null;
 }
@@ -385,11 +388,12 @@ $('#items').onclick = e => {
 const paintCoins = () => $('#coinN').textContent = S.coins;
 function fillVoices() {
   const sel = $('#sVoice'), vs = voices().slice().sort((a, b) => (/^en/i.test(b.lang) - /^en/i.test(a.lang)) || a.name.localeCompare(b.name));
-  sel.innerHTML = '<option value="">Auto (deep male)</option>' + vs.map(v => `<option value="${v.name}">${MALE.test(v.name) ? '♂ ' : ''}${v.name} (${v.lang})</option>`).join('');
+  const preferred = vs.find(v => PREFERRED_VOICE.test(v.name) && /^en-US$/i.test(v.lang));
+  sel.innerHTML = `<option value="">Auto (${preferred ? `${preferred.name}, ${preferred.lang}` : 'English (US)'})</option>` + vs.map(v => `<option value="${v.name}">${v.name} (${v.lang})</option>`).join('');
   sel.value = S.voice;
 }
 if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = fillVoices;
-$('#gear').onclick = () => { fillVoices(); $('#sPitch').value = S.pitch; $('#sRate').value = S.rate; $('#sBreak').value = S.brk; $('#settings').showModal(); };
+$('#gear').onclick = () => { fillVoices(); $('#sPitch').value = S.pitch; $('#sRate').value = S.rate; $('#sBreak').value = S.brk || DEFAULT_BREAK; $('#settings').showModal(); };
 $('#sVoice').onchange = e => { S.voice = e.target.value; save(); };
 $('#sPitch').oninput = e => { S.pitch = +e.target.value; save(); };
 $('#sRate').oninput = e => { S.rate = +e.target.value; save(); };
@@ -422,5 +426,9 @@ function boot() {
   setHome();
 }
 addEventListener('resize', () => layout(false) || (P.y = Math.min(P.y, ground())));
+// Keep pinch and double-tap zoom from changing the game viewport on mobile Safari.
+document.addEventListener('gesturestart', e => e.preventDefault(), {passive:false});
+document.addEventListener('gesturechange', e => e.preventDefault(), {passive:false});
+document.addEventListener('gestureend', e => e.preventDefault(), {passive:false});
 paintCoins(); refreshLook(); layout(true); requestAnimationFrame(loop); buddy.classList.add('idle');
 if (!S.name) $('#welcome').showModal(); else boot();

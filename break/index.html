@@ -55,11 +55,11 @@
       // Break zone: max 3 minutes, can end early. Returns to the buddy site (?r=...), which then gives the next task.
       (function(){
         var q=new URLSearchParams(location.search);
-        var back=q.get('r')||'../index.html', left=parseInt(q.get('t'),10)||180, c=document.getElementById('hudC');
+        var back=q.get('r')||'../index.html', left=Math.max(0,parseInt(q.get('t'),10)||180), c=document.getElementById('hudC');
         function fmt(){c.textContent=Math.floor(left/60)+':'+String(left%60).padStart(2,'0');}
         function go(){location.href=back+(back.indexOf('?')>-1?'&':'?')+'back=1';}
         fmt();
-        var iv=setInterval(function(){left--;fmt();if(left<=0){clearInterval(iv);go();}},1000);
+        var iv=setInterval(function(){left=Math.max(0,left-1);fmt();if(left<=0){clearInterval(iv);go();}},1000);
         document.getElementById('hudDone').addEventListener('click',go);
         ['pointerdown','touchstart','touchmove'].forEach(function(ev){document.getElementById('hud').addEventListener(ev,function(e){e.stopPropagation();});});
       })();

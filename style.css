@@ -6,7 +6,7 @@
   font-family:Fredoka,ui-rounded,"SF Pro Rounded",system-ui,sans-serif;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;overflow:hidden;background:var(--cream);color:var(--ink);overscroll-behavior:none}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--cream);color:var(--ink);overscroll-behavior:none;touch-action:manipulation}
 button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--lav);outline-offset:2px}
 h2{margin:0 0 6px;font-size:21px;line-height:1.15}
@@ -127,6 +127,25 @@ p{margin:0}
 .item b{font-size:13px;font-weight:600}
 .item button{background:var(--gold);border:2px solid var(--ink);border-radius:10px;padding:5px;font-weight:700;font-size:13px}
 .item button.own{background:#d7f4e8}.item button.on{background:var(--mint);color:#06281e}
+
+/* Keep the shop controls compact so the buddy keeps the same roomy stage as Home. */
+.p-shop{min-width:0}
+#items{height:106px;align-items:stretch;overscroll-behavior-x:contain}
+.item{flex-basis:clamp(88px,25vw,108px);padding:5px;gap:2px;grid-template-rows:32px 1fr auto;min-width:0}
+.item .art{height:32px;font-size:27px}
+.item .sw{width:28px;height:28px}
+.item b{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item button{padding:4px 2px;font-size:12px;white-space:nowrap}
+@media(max-height:700px){
+  #bottom{gap:5px;padding-top:5px;padding-bottom:calc(env(safe-area-inset-bottom) + 5px)}
+  #tabs{margin-bottom:4px}
+  #tabs button{padding:6px;font-size:13px}
+  #items{height:96px}
+  .item{grid-template-rows:28px 1fr auto}
+  .item .art{height:28px}
+  #nav button{padding:5px;gap:0}
+  #nav button span{font-size:20px}
+}
 
 /* dialogs */
 dialog{border:3px solid var(--ink);border-radius:24px;padding:20px;width:min(92vw,420px);background:#fffaf5;color:var(--ink);box-shadow:0 8px 0 var(--ink)}
