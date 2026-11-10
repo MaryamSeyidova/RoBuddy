@@ -6,20 +6,20 @@ const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAl
 if (location.search.includes('fast')) localStorage.setItem('rb-fast', '1');
 if (location.search.includes('slow')) localStorage.removeItem('rb-fast');
 const FAST = localStorage.getItem('rb-fast') === '1';
-const DEFAULT_BREAK = 'https://maryamseyidova.github.io/NFC-audio/';
+const DEFAULT_BREAK = 'break.html';
 const VISION_ENDPOINT = '';                 // optional: your server that judges photos → {ok:boolean, comment:string}
 const BW = 200, BH = 250, TASKS_PER_DAY = 3;
 
 /* ---------- content ---------- */
 const TASKS = [
-  {t:'Open your project', min:5, s:['Open the file you need.','Do not edit yet.','Look at it for five minutes.']},
-  {t:'Improve one tiny detail', min:10, s:['Pick one small detail.','Make it better.','Save your work.']},
-  {t:'Learn one useful thing', min:10, s:['Find one short tutorial.','Learn one idea only.','Write it in one sentence.']},
-  {t:'Make a rough first draft', min:15, s:['Start a timer-free sketch.','Do not judge it.','Save it as draft one.']},
-  {t:'Reset your workspace', min:5, s:['Put five things away.','Close five tabs.','Keep only what you need.']},
-  {t:'Collect three references', min:10, s:['Find three examples.','Save one detail from each.','Write the pattern you see.']},
-  {t:'Finish one open loop', min:15, s:['Pick something almost done.','Remove the last obstacle.','Mark it complete.']},
-  {t:'Practice out loud', min:10, s:['Pick one idea or pitch.','Say it out loud once.','Say it again, a bit better.']}
+  {t:'Open your project', min:1, s:['Open the file you need.','Do not edit yet.','Look at it for five minutes.']},
+  {t:'Improve one tiny detail', min:1, s:['Pick one small detail.','Make it better.','Save your work.']},
+  {t:'Learn one useful thing', min:1, s:['Find one short tutorial.','Learn one idea only.','Write it in one sentence.']},
+  {t:'Make a rough first draft', min:1, s:['Start a timer-free sketch.','Do not judge it.','Save it as draft one.']},
+  {t:'Reset your workspace', min:1, s:['Put five things away.','Close five tabs.','Keep only what you need.']},
+  {t:'Collect three references', min:1, s:['Find three examples.','Save one detail from each.','Write the pattern you see.']},
+  {t:'Finish one open loop', min:1, s:['Pick something almost done.','Remove the last obstacle.','Mark it complete.']},
+  {t:'Practice out loud', min:1, s:['Pick one idea or pitch.','Say it out loud once.','Say it again, a bit better.']}
 ];
 const PENALTIES = ['Do 10 jumping jacks.','Drink a full glass of water.','Stand up and stretch for 30 seconds.','Put 5 things back where they belong.','Do 10 slow squats.'];
 const L = {
@@ -40,7 +40,7 @@ const ITEMS = {
 
 /* ---------- state ---------- */
 const def = {name:'',goal:'',coins:60,own:['c:peach','h:none','b:none'],eq:{c:'peach',h:'none',b:'none'},
-  day:'',done:0,phase:'idle',m:-1,left:0,total:0,voice:'',pitch:.7,rate:.95,brk:''};
+  day:'',done:0,phase:'idle',m:-1,left:0,total:0,voice:'',pitch:.7,rate:.95};
 let S; try { S = {...def, ...JSON.parse(localStorage.getItem('robuddy-v3') || '{}')}; } catch { S = {...def}; }
 const dayKey = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; };
 if (S.day !== dayKey()) { S.day = dayKey(); S.done = 0; S.phase = 'idle'; S.m = -1; }
@@ -333,7 +333,7 @@ async function completeTask() {
   S.done++; S.coins += 20; S.phase = 'break'; save(); paintCoins();
   await say(S.done >= TASKS_PER_DAY ? 'Last task done! One more break, then you are free.' : 'Task done! Break zone. Three minutes at most.', 'happy');
   leaving = true;
-  const base = S.brk || DEFAULT_BREAK, here = location.href.split('?')[0].split('#')[0];
+  const base = DEFAULT_BREAK, here = location.href.split('?')[0].split('#')[0];
   location.href = base + (base.includes('?') ? '&' : '?') + 'r=' + encodeURIComponent(here) + '&t=' + (FAST ? 18 : 180);
 }
 async function finale() {
@@ -393,11 +393,10 @@ function fillVoices() {
   sel.value = S.voice;
 }
 if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = fillVoices;
-$('#gear').onclick = () => { fillVoices(); $('#sPitch').value = S.pitch; $('#sRate').value = S.rate; $('#sBreak').value = S.brk || DEFAULT_BREAK; $('#settings').showModal(); };
+$('#gear').onclick = () => { fillVoices(); $('#sPitch').value = S.pitch; $('#sRate').value = S.rate; $('#settings').showModal(); };
 $('#sVoice').onchange = e => { S.voice = e.target.value; save(); };
 $('#sPitch').oninput = e => { S.pitch = +e.target.value; save(); };
 $('#sRate').oninput = e => { S.rate = +e.target.value; save(); };
-$('#sBreak').onchange = e => { S.brk = e.target.value.trim(); save(); };
 $('#sTest').onclick = () => speakText(`Hello ${S.name || 'human'}. It is time for task.`);
 $('#sReset').onclick = () => { S.done = 0; S.phase = 'idle'; S.m = -1; save(); location.reload(); };
 $('#welcome').addEventListener('cancel', e => e.preventDefault());
